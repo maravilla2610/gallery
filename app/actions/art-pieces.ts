@@ -17,16 +17,18 @@ export async function getArtPiecesByArtist(artistId: string): Promise<ArtPiece[]
         created_at: 'desc',
       },
     })
-    
+
     // Parse and serialize each art piece for client-safe transmission
-    return artPieces.map(piece => ({
-      ...piece,
+    return artPieces.map((piece): ArtPiece => ({
+      id: piece.id,
       created_at: piece.created_at.toISOString(),
-      // Parse the prisma decimal to a number or null
+      name: piece.name,
+      description: piece.description,
       price: piece.price ? parseFloat(piece.price.toString()) : null,
       qr_code: piece.qr_code || null,
+      artist_id: piece.artist_id,
       image: piece.image || undefined,
-    })) as ArtPiece[]
+    }))
   } catch (error) {
     console.error('Error fetching art pieces:', error)
     throw new Error('Failed to fetch art pieces')
