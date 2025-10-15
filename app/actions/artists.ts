@@ -23,13 +23,15 @@ export async function getArtists(): Promise<Artist[]> {
         })
         
         console.log('Fetched artists:', artists)
-        
+
         // Parse and serialize each artist for client-safe transmission
-        return artists.map(artist => ({
-            ...artist,
+        return artists.map((artist: typeof artists[0]): Artist => ({
+            id: artist.id,
+            name: artist.name,
             created_at: artist.created_at.toISOString(),
+            image: artist.image,
             _count: artist._count?.art_pieces,
-        } as Artist))
+        }))
     } catch (error) {
         console.error('Error fetching artists:', error)
         throw new Error('Failed to fetch artists')
@@ -50,9 +52,10 @@ export async function createArtist(input: CreateArtistInput): Promise<Artist> {
         console.log('Created artist:', artist)
 
         return {
-            ...artist,
+            id: artist.id,
             created_at: artist.created_at.toISOString(),
-            name: artist.name || '',
+            name: artist.name,
+            image: artist.image,
         }
     } catch (error) {
         console.error('Error creating artist:', error)

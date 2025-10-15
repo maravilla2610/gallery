@@ -5,9 +5,10 @@ import { Prisma } from '@prisma/client'
 export const artistSchema = z.object({
   id: z.string().uuid(),
   created_at: z.string().datetime(),
-  name: z.string().min(1).max(255),
+  name: z.string().min(1).max(255).nullable(),
+  image: z.string().nullable(),
   _count: z.number().optional(),
-}) satisfies z.Schema<Prisma.artistUncheckedCreateInput>
+})
 
 
 
