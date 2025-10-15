@@ -19,7 +19,7 @@ export async function getArtPiecesByArtist(artistId: string): Promise<ArtPiece[]
     })
 
     // Parse and serialize each art piece for client-safe transmission
-    return artPieces.map((piece): ArtPiece => ({
+    return artPieces.map((piece: typeof artPieces[0]): ArtPiece => ({
       id: piece.id,
       created_at: piece.created_at.toISOString(),
       name: piece.name,
