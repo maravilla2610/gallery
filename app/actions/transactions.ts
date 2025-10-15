@@ -7,7 +7,7 @@ export async function getTransactions(): Promise<Transaction[]> {
     try {
         const transactions = await prisma.transactions.findMany()
         // Convert Decimal to number for client-safe transmission
-        return transactions.map(t => ({
+        return transactions.map((t: typeof transactions[0]) => ({
             id: t.id,
             created_at: t.created_at,
             amount: t.amount ? parseFloat(t.amount.toString()) : null,
