@@ -1,6 +1,6 @@
 'use client'
 
-import { IconCirclePlusFilled, IconMail } from "@tabler/icons-react"
+import { IconCirclePlusFilled } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import {
   Modal,
@@ -9,14 +9,14 @@ import {
   ModalContent,
 } from "@/components/ui/animated-modal"
 import CreateArtPieceForm from "@/components/create-art-piece-form"
-import { artist } from "@prisma/client"
+import { Artist } from "@/lib/schemas/artist.schema"
 
-export function QuickCreateModal({ 
-  artists, 
-  isLoading 
-}: { 
-  artists: artist[]
-  isLoading?: boolean 
+export function QuickCreateModal({
+  artists,
+  isLoading
+}: {
+  artists: Artist[]
+  isLoading?: boolean
 }) {
   console.log("Artists in QuickCreateModal:", artists)
   return (

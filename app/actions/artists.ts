@@ -2,8 +2,7 @@
 
 import prisma from '@/prisma/client'
 import { revalidatePath } from 'next/cache'
-import { 
-  createArtistSchema, 
+import {
   type Artist,
   type CreateArtistInput 
 } from '@/lib/schemas/artist.schema'

@@ -1,6 +1,3 @@
-import { Prisma } from '@prisma/client'
-import { artist } from '@prisma/client'
-
 import { z } from 'zod'
 
 // Schema for serialized art piece (for client components)

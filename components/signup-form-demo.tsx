@@ -3,12 +3,7 @@ import React, { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import {
-  IconBrandGithub,
-  IconBrandGoogle,
-} from "@tabler/icons-react";
 import { createClient } from "@/lib/utils/supabase/client";
-import { useRouter } from "next/navigation";
 
 export default function SignupFormDemo() {
   const [email, setEmail] = useState("");
@@ -18,7 +13,6 @@ export default function SignupFormDemo() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -1,5 +1,4 @@
 import LoginFormDemo from '@/components/login-form-demo'
-import Link from 'next/link'
 import { BackgroundRippleEffect } from '@/components/ui/background-ripple'
 export default function LoginPage() {
   return (

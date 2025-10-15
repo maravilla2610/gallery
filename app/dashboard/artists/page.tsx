@@ -16,7 +16,6 @@ import { getArtists } from "@/app/actions/artists"
 import { useEffect, useState } from "react"
 import type { Artist } from "@/lib/schemas/artist.schema"
 import { Skeleton } from "@/components/ui/skeleton"
-import { get } from "http"
 
 export default function ArtistsPage() {
   const [artists, setArtists] = useState<Artist[]>([])

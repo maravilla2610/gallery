@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { cookies } from 'next/headers'
 import prisma from "@/prisma/client"
 import { createClient } from "@/lib/utils/supabase/client"
 import Link from "next/link"

@@ -187,7 +187,7 @@ export default function ArtPiecesPage() {
       ) : (
         <div className="py-6">
           <h2 className="text-xl font-semibold mb-6 text-center">
-            {selectedArtist?.name}'s Collection
+            {selectedArtist?.name}&apos;s Collection
           </h2>
           <FocusCards cards={focusCardsData} />
         </div>
