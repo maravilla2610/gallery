@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { Prisma } from '@prisma/client'
 
 // Schema for serialized artist (for client components)
 export const artistSchema = z.object({
