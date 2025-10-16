@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useModal } from '@/components/ui/animated-modal'
 import React, { useState } from 'react'
 import {
   Form,
@@ -28,14 +27,21 @@ import { useCreateArtPiece } from '@/hooks/use-art-pieces'
 import { createArtPieceSchema } from '@/lib/schemas/art-piece.schema'
 import type { Artist } from '@/lib/schemas/artist.schema'
 import { createClient } from '@/lib/utils/supabase/client'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupTextarea,
+} from '@/components/ui/input-group'
+import { IconCurrencyDollar, IconCalendar, IconPalette } from '@tabler/icons-react'
 
 interface CreateArtPieceFormProps {
   onSuccess?: () => void
   artists: Artist[]
+  onOpenChange?: (open: boolean) => void
 }
 
-export default function CreateArtPieceForm({ onSuccess, artists }: CreateArtPieceFormProps) {
-  const { setOpen } = useModal()
+export default function CreateArtPieceForm({ onSuccess, artists, onOpenChange }: CreateArtPieceFormProps) {
   const createArtPiece = useCreateArtPiece()
   const [isUploading, setIsUploading] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -50,6 +56,8 @@ export default function CreateArtPieceForm({ onSuccess, artists }: CreateArtPiec
       price: undefined,
       artist_id: '',
       image: undefined,
+      type: '',
+      year: undefined,
     },
   })
 
@@ -124,8 +132,8 @@ export default function CreateArtPieceForm({ onSuccess, artists }: CreateArtPiec
       form.reset()
       setSelectedFile(null)
 
-      // Close modal
-      setOpen(false)
+      // Close dialog
+      onOpenChange?.(false)
 
       // Show success message
       toast.success('Art piece created successfully!')
@@ -168,13 +176,14 @@ export default function CreateArtPieceForm({ onSuccess, artists }: CreateArtPiec
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <textarea
-                  placeholder="Enter description"
-                  rows={4}
-                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  {...field}
-                  value={field.value || ''}
-                />
+                <InputGroup>
+                  <InputGroupTextarea
+                    placeholder="Enter description"
+                    rows={4}
+                    {...field}
+                    value={field.value || ''}
+                  />
+                </InputGroup>
               </FormControl>
               <FormDescription>
                 Optional description of the art piece.
@@ -191,17 +200,22 @@ export default function CreateArtPieceForm({ onSuccess, artists }: CreateArtPiec
             <FormItem>
               <FormLabel>Price</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  step="0.01"
-                  placeholder="Enter price"
-                  {...field}
-                  value={field.value ? Number(field.value) : ''}
-                  onChange={(e) => {
-                    const value = e.target.value
-                    field.onChange(value === '' ? null : parseFloat(value))
-                  }}
-                />
+                <InputGroup>
+                  <InputGroupAddon>
+                    <IconCurrencyDollar className="h-4 w-4" />
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    type="number"
+                    step="0.01"
+                    placeholder="Enter price"
+                    {...field}
+                    value={field.value ? Number(field.value) : ''}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      field.onChange(value === '' ? null : parseFloat(value))
+                    }}
+                  />
+                </InputGroup>
               </FormControl>
               <FormDescription>
                 Optional price for the art piece.
@@ -258,6 +272,59 @@ export default function CreateArtPieceForm({ onSuccess, artists }: CreateArtPiec
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Type</FormLabel>
+              <FormControl>
+                <InputGroup>
+                  <InputGroupAddon>
+                    <IconPalette className="h-4 w-4" />
+                  </InputGroupAddon>
+                  <InputGroupInput placeholder="e.g., Painting, Sculpture" {...field} />
+                </InputGroup>
+              </FormControl>
+              <FormDescription>
+                The type of your art piece (2-255 characters).
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="year"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Year</FormLabel>
+              <FormControl>
+                <InputGroup>
+                  <InputGroupAddon>
+                    <IconCalendar className="h-4 w-4" />
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    type="number"
+                    placeholder="Enter year of creation"
+                    {...field}
+                    value={field.value ? Number(field.value) : ''}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      field.onChange(value === '' ? undefined : parseInt(value, 10))
+                    }}
+                  />
+                </InputGroup>
+              </FormControl>
+              <FormDescription>
+                The year the art piece was created (between 1000 and {new Date().getFullYear()}).
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+  
 
         <FormItem>
           <FormLabel>Image</FormLabel>
@@ -284,7 +351,7 @@ export default function CreateArtPieceForm({ onSuccess, artists }: CreateArtPiec
           <Button
             type="button"
             variant="outline"
-            onClick={() => setOpen(false)}
+            onClick={() => onOpenChange?.(false)}
             disabled={createArtPiece.isPending || isUploading}
           >
             Cancel

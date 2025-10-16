@@ -18,6 +18,8 @@ model art_piece {
   qr_code      String?        @db.VarChar
   artist_id    String         @db.Uuid
   image        String?        @db.VarChar
+  year         BigInt?
+  type         String?        @db.VarChar
   artist       artist         @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   transactions transactions[]
 }

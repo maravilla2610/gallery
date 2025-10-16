@@ -26,6 +26,9 @@ export default function LoginFormDemo() {
       },
     });
 
+    // Log the request data 
+    console.log("Magic link request data:", { email, options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback` } });
+
     if (error) {
       setError(error.message);
       setLoading(false);
@@ -36,7 +39,7 @@ export default function LoginFormDemo() {
   };
 
   return (
-    <div className="shadow-input w-full rounded-none bg-white p-10 md:rounded-2xl md:p-12 dark:bg-black">
+    <div className="shadow-input w-full rounded-2xl bg-white p-10 md:p-12 dark:bg-black">
       <h2 className="text-3xl font-bold text-neutral-800 dark:text-neutral-200">
         <TextGenerateEffect words="Welcome back" />
       </h2>

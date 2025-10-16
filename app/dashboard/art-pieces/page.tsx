@@ -5,11 +5,13 @@ import { FocusCards } from "@/components/focus-cards"
 import { Button } from "@/components/ui/button"
 import { IconPlus, IconPalette } from "@tabler/icons-react"
 import {
-  Modal,
-  ModalTrigger,
-  ModalBody,
-  ModalContent,
-} from "@/components/ui/animated-modal"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import CreateArtPieceForm from "@/components/create-art-piece-form"
 import {
   Select,
@@ -19,9 +21,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useArtists } from "@/hooks/use-artists"
-import { getArtPiecesByArtist } from "@/app/actions/art-pieces"
+import { getArtPiecesByArtist, deleteArtPiece, generateArtPieceDocument } from "@/app/actions/art-pieces"
 import { Skeleton } from "@/components/ui/skeleton"
 import type { ArtPiece } from "@/lib/schemas/art-piece.schema"
+import { toast } from 'sonner'
 
 export default function ArtPiecesPage() {
   const { data: artists, isLoading: artistsLoading } = useArtists()
@@ -29,6 +32,7 @@ export default function ArtPiecesPage() {
   const [artPieces, setArtPieces] = useState<ArtPiece[]>([])
   const [loadingArtPieces, setLoadingArtPieces] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   // Set the first artist as selected by default when artists are loaded
   useEffect(() => {
@@ -60,12 +64,51 @@ export default function ArtPiecesPage() {
     setRefreshKey((prev) => prev + 1)
   }
 
+  const handleDelete = async (artPieceId: string) => {
+    if (!confirm("Are you sure you want to delete this art piece? This action cannot be undone.")) {
+      return
+    }
+
+    try {
+      await deleteArtPiece(artPieceId)
+      toast.success("Art piece deleted successfully")
+      setRefreshKey((prev) => prev + 1)
+    } catch (error) {
+      console.error("Error deleting art piece:", error)
+      toast.error("Failed to delete art piece. Please try again.")
+    }
+  }
+
+  const handleDownload = async (artPieceId: string) => {
+    try {
+      const html = await generateArtPieceDocument(artPieceId)
+      const blob = new Blob([html], { type: "text/html" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      const artPiece = artPieces.find((p) => p.id === artPieceId)
+      a.download = `${artPiece?.name || "art-piece"}-certificate.html`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+
+      toast.success("Document downloaded successfully")
+    } catch (error) {
+      console.error("Error downloading document:", error)
+      toast.error("Failed to download document. Please try again.") 
+    }
+  }
+
   const selectedArtist = artists?.find((a) => a.id === selectedArtistId)
 
   // Transform art pieces to focus cards format
   const focusCardsData = artPieces.map((piece) => ({
     title: piece.name,
     src: piece.image || "/placeholder.png", // Display the uploaded image
+    id: piece.id,
+    onDelete: handleDelete,
+    onDownload: handleDownload,
   }))
 
   return (
@@ -88,7 +131,7 @@ export default function ArtPiecesPage() {
             <SelectTrigger className="w-full sm:w-[250px]">
               <SelectValue placeholder="Select an artist" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent position="item-aligned" sideOffset={5}>
               {artists?.map((artist) => (
                 <SelectItem key={artist.id} value={artist.id}>
                   {artist.name || "Unnamed Artist"}
@@ -98,27 +141,29 @@ export default function ArtPiecesPage() {
           </Select>
 
           {/* Add Art Piece Button */}
-          <Modal>
-            <ModalTrigger>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
               <Button disabled={!selectedArtistId}>
                 <IconPlus className="mr-2 h-4 w-4" />
                 Add Art Piece
               </Button>
-            </ModalTrigger>
-            <ModalBody>
-              <ModalContent className="overflow-y-auto">
-                <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-6">
-                  Create New Art Piece
-                </h2>
-                {artists && (
-                  <CreateArtPieceForm 
-                    artists={artists}
-                    onSuccess={handleArtPieceCreated}
-                  />
-                )}
-              </ModalContent>
-            </ModalBody>
-          </Modal>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-hide">
+              <DialogHeader>
+                <DialogTitle>Create New Art Piece</DialogTitle>
+                <DialogDescription>
+                  Add a new art piece to your gallery collection.
+                </DialogDescription>
+              </DialogHeader>
+              {artists && (
+                <CreateArtPieceForm 
+                  artists={artists}
+                  onSuccess={handleArtPieceCreated}
+                  onOpenChange={setDialogOpen}
+                />
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -162,27 +207,29 @@ export default function ArtPiecesPage() {
           <p className="text-muted-foreground text-center mb-6 max-w-md">
             Get started by adding the first art piece for this artist. You can add descriptions, pricing, and more.
           </p>
-          <Modal>
-            <ModalTrigger>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
               <Button size="lg">
                 <IconPlus className="mr-2 h-4 w-4" />
                 Add First Art Piece
               </Button>
-            </ModalTrigger>
-            <ModalBody>
-              <ModalContent className="overflow-y-auto">
-                <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-6">
-                  Create New Art Piece
-                </h2>
-                {artists && (
-                  <CreateArtPieceForm 
-                    artists={artists}
-                    onSuccess={handleArtPieceCreated}
-                  />
-                )}
-              </ModalContent>
-            </ModalBody>
-          </Modal>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-hide">
+              <DialogHeader>
+                <DialogTitle>Create New Art Piece</DialogTitle>
+                <DialogDescription>
+                  Add a new art piece to your gallery collection.
+                </DialogDescription>
+              </DialogHeader>
+              {artists && (
+                <CreateArtPieceForm 
+                  artists={artists}
+                  onSuccess={handleArtPieceCreated}
+                  onOpenChange={setDialogOpen}
+                />
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
       ) : (
         <div className="py-6">

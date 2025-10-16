@@ -94,7 +94,19 @@ export const ModalBody = ({
 
   const modalRef = useRef<HTMLDivElement>(null);
   const { setOpen } = useModal();
-  useOutsideClick(modalRef, () => setOpen(false));
+  
+  // Disable outside click when any select is open
+  const handleOutsideClick = () => {
+    // Check if any select dropdown is currently open
+    const hasOpenSelect = document.querySelector('[data-state="open"][role="listbox"]') ||
+                         document.querySelector('[data-radix-select-content]');
+    
+    if (!hasOpenSelect) {
+      setOpen(false);
+    }
+  };
+  
+  useOutsideClick(modalRef, handleOutsideClick);
 
   if (!mounted) return null;
 
@@ -120,7 +132,7 @@ export const ModalBody = ({
           <motion.div
             ref={modalRef}
             className={cn(
-              "min-h-[50%] max-h-[90%] md:max-w-[40%] w-full mx-4 bg-white dark:bg-neutral-950 border border-transparent dark:border-neutral-800 md:rounded-2xl relative z-[10000] flex flex-col overflow-hidden",
+              "min-h-[50%] max-h-[90%] md:max-w-[40%] w-full mx-4 bg-white dark:bg-neutral-950 border border-transparent dark:border-neutral-800 rounded-2xl relative z-[10000] flex flex-col overflow-hidden",
               className
             )}
             initial={{
@@ -244,10 +256,24 @@ export const useOutsideClick = (
 ) => {
   useEffect(() => {
     const listener = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node;
+      
       // DO NOTHING if the element being clicked is the target element or their children
-      if (!ref.current || ref.current.contains(event.target as Node)) {
+      if (!ref.current || ref.current.contains(target)) {
         return;
       }
+
+      // DO NOTHING if clicking on a Radix UI portal (Select, Dialog, etc.)
+      // Check if the click is inside any portal container
+      const isInsidePortal = (target as Element).closest('[data-radix-popper-content-wrapper]') ||
+                            (target as Element).closest('[data-radix-portal]') ||
+                            (target as Element).closest('[role="dialog"]') ||
+                            (target as Element).closest('[data-slot="select-content"]');
+      
+      if (isInsidePortal) {
+        return;
+      }
+
       callback(event);
     };
 

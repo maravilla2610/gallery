@@ -3,13 +3,16 @@
 import { IconCirclePlusFilled } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import {
-  Modal,
-  ModalTrigger,
-  ModalBody,
-  ModalContent,
-} from "@/components/ui/animated-modal"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import CreateArtPieceForm from "@/components/create-art-piece-form"
 import { Artist } from "@/lib/schemas/artist.schema"
+import { useState } from "react"
 
 export function QuickCreateModal({
   artists,
@@ -18,11 +21,14 @@ export function QuickCreateModal({
   artists: Artist[]
   isLoading?: boolean
 }) {
+  const [open, setOpen] = useState(false)
+  
   console.log("Artists in QuickCreateModal:", artists)
+  
   return (
     <div className="flex items-center gap-2 w-full">
-      <Modal>
-        <ModalTrigger className="flex-1">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
           <Button
             className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground w-full justify-start gap-2"
             disabled={isLoading}
@@ -30,16 +36,17 @@ export function QuickCreateModal({
             <IconCirclePlusFilled />
             <span>{isLoading ? 'Loading...' : 'Quick Create'}</span>
           </Button>
-        </ModalTrigger>
-        <ModalBody>
-          <ModalContent className="overflow-y-auto">
-            <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-6">
-              Create New Art Piece
-            </h2>
-            <CreateArtPieceForm artists={artists} />
-          </ModalContent>
-        </ModalBody>
-      </Modal>
+        </DialogTrigger>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-hide">
+          <DialogHeader>
+            <DialogTitle>Create New Art Piece</DialogTitle>
+            <DialogDescription>
+              Add a new art piece to your gallery collection.
+            </DialogDescription>
+          </DialogHeader>
+          <CreateArtPieceForm artists={artists} onOpenChange={setOpen} />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -10,6 +10,8 @@ export const artPieceSchema = z.object({
   qr_code: z.string().nullable(),
   artist_id: z.string().uuid(),
   image: z.string().nullable().optional(),
+  type: z.string().min(2).max(255),
+  year: z.number().min(1000).max(new Date().getFullYear()).optional(),
 })
 
 // Schema for creating an art piece (doesn't need id, created_at, or qr_code)
@@ -19,6 +21,8 @@ export const createArtPieceSchema = z.object({
   price: z.number().min(0.01).max(999999.99).nullable().optional(),
   artist_id: z.string().uuid("Please select an artist"),
   image: z.string().nullable().optional(),
+  type: z.string().min(2, "Type is required").max(255, "Type must be less than 255 characters"),
+  year: z.number().min(1000, "Year must be a valid year").max(new Date().getFullYear(), `Year cannot be in the future`).optional(),
 })
 
 // Schema for updating an art piece

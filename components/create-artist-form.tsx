@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useModal } from '@/components/ui/animated-modal'
 import {
   Form,
   FormControl,
@@ -24,7 +23,6 @@ interface CreateArtistFormProps {
 }
 
 export default function CreateArtistForm({ onSuccess }: CreateArtistFormProps) {
-  const { setOpen } = useModal()
   const createArtist = useCreateArtist()
 
   // Define the form using the Zod schema
@@ -43,13 +41,10 @@ export default function CreateArtistForm({ onSuccess }: CreateArtistFormProps) {
       // Reset form
       form.reset()
       
-      // Close modal
-      setOpen(false)
-      
       // Show success message
       toast.success('Artist created successfully!')
       
-      // Call success callback if provided
+      // Call success callback if provided (this will close the dialog)
       if (onSuccess) {
         onSuccess()
       }
@@ -81,14 +76,10 @@ export default function CreateArtistForm({ onSuccess }: CreateArtistFormProps) {
 
         <div className="flex justify-end gap-2 pt-4">
           <Button
-            type="button"
-            variant="outline"
-            onClick={() => setOpen(false)}
+            type="submit"
             disabled={createArtist.isPending}
+            className="w-full"
           >
-            Cancel
-          </Button>
-          <Button type="submit" disabled={createArtist.isPending}>
             {createArtist.isPending ? 'Creating...' : 'Create Artist'}
           </Button>
         </div>

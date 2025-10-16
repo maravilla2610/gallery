@@ -4,11 +4,13 @@ import { HoverEffect } from "@/components/card-hover-effect"
 import { Button } from "@/components/ui/button"
 import { IconPlus, IconUser } from "@tabler/icons-react"
 import {
-  Modal,
-  ModalTrigger,
-  ModalBody,
-  ModalContent,
-} from "@/components/ui/animated-modal"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import CreateArtistForm from "@/components/create-artist-form"
 import { useDeleteArtist } from "@/hooks/use-artists"
 import { toast } from "sonner"
@@ -21,6 +23,7 @@ export default function ArtistsPage() {
   const [artists, setArtists] = useState<Artist[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [dialogOpen, setDialogOpen] = useState(false)
   const deleteArtist = useDeleteArtist()
 
   useEffect(() => {
@@ -58,6 +61,7 @@ export default function ArtistsPage() {
 
   const handleArtistCreated = () => {
     setRefreshKey(prev => prev + 1)
+    setDialogOpen(false)
   }
 
   return (
@@ -70,22 +74,23 @@ export default function ArtistsPage() {
             Manage and view all artists in your gallery
           </p>
         </div>
-        <Modal>
-          <ModalTrigger>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
             <Button>
               <IconPlus className="mr-2 h-4 w-4" />
               Add Artist
             </Button>
-          </ModalTrigger>
-          <ModalBody>
-            <ModalContent className="overflow-y-auto">
-              <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-6">
-                Create New Artist
-              </h2>
-              <CreateArtistForm onSuccess={handleArtistCreated} />
-            </ModalContent>
-          </ModalBody>
-        </Modal>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-hide">
+            <DialogHeader>
+              <DialogTitle>Create New Artist</DialogTitle>
+              <DialogDescription>
+                Add a new artist to your gallery collection.
+              </DialogDescription>
+            </DialogHeader>
+            <CreateArtistForm onSuccess={handleArtistCreated} />
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Artists Grid */}
@@ -104,22 +109,23 @@ export default function ArtistsPage() {
           <p className="text-muted-foreground text-center mb-6 max-w-md">
             Get started by adding your first artist to the gallery. Artists can have multiple art pieces associated with them.
           </p>
-          <Modal>
-            <ModalTrigger>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
               <Button size="lg">
                 <IconPlus className="mr-2 h-4 w-4" />
                 Add Your First Artist
               </Button>
-            </ModalTrigger>
-            <ModalBody>
-              <ModalContent className="overflow-y-auto">
-                <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-6">
-                  Create New Artist
-                </h2>
-                <CreateArtistForm onSuccess={handleArtistCreated} />
-              </ModalContent>
-            </ModalBody>
-          </Modal>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-hide">
+              <DialogHeader>
+                <DialogTitle>Create New Artist</DialogTitle>
+                <DialogDescription>
+                  Add a new artist to your gallery collection.
+                </DialogDescription>
+              </DialogHeader>
+              <CreateArtistForm onSuccess={handleArtistCreated} />
+            </DialogContent>
+          </Dialog>
         </div>
       ) : (
         <HoverEffect 
